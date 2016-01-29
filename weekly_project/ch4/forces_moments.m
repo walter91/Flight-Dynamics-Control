@@ -35,20 +35,26 @@ function out = forces_moments(x, delta, wind, P)
     u_wg    = wind(4); % gust along body x-axis
     v_wg    = wind(5); % gust along body y-axis    
     w_wg    = wind(6); % gust along body z-axis
+
+    Rbv = [cos(theta)*cos(psi), cos(theta)*sin(psi), -sin(theta);...
+        sin(phi)*sin(theta)*cos(psi)-cos(phi)*sin(psi), sin(phi)*sin(theta)*sin(psi)+cos(phi)*cos(psi), sin(phi)*cos(theta);...
+        cos(phi)*sin(theta)*cos(psi)+sin(phi)*sin(psi), cos(phi)*sin(theta)*sin(psi)-sin(phi)*cos(psi), cos(phi)*cos(theta)];
+    
+    %wind gusts in the Body frame converted to NED frame (vehicle)
+    wind_gust_ned = Rbv'*wind(4:6)
     
     % compute wind data in NED
-    w_n = w_ns + u_wg;
-    w_e = w_es + v_wg;
-    w_d = w_ds + w_wg;
+    w_n = w_ns + wind_gust_ned(1);
+    w_e = w_es + wind_gust_ned(1);
+    w_d = w_ds + wind_gust_ned(1);
     
-    w_n = .001;
-    w_e = .001;
-    w_d = .001;
+    %wind in NED converted to Body frame
+    wind_body = Rbv*[w_n; w_e; w_d];
     
     % Body frame componenets of the airspeed vector
-    u_r = u - w_n;
-    v_r = v - w_e;
-    w_r = w - w_d;
+    u_r = u - wind_body(1);
+    v_r = v - wind_body(2);
+    w_r = w - wind_body(3);
     
     % compute air data
     Va = sqrt((u_r)^2 + (v_r)^2 + (w_r)^2);
@@ -92,7 +98,6 @@ function out = forces_moments(x, delta, wind, P)
         *(P.c*(P.Cmo + P.Cma*alpha + P.Cmq*(P.c/(2*Va))*q...
             + P.Cmd_e*delta_e))...
         + 0;
-    
     
     Torque(3) = (1/2)*P.rho*(Va)^2*P.S...
         *(P.b*(P.Cno + P.Cnb*beta + P.Cnp*(P.b/(2*Va))*p ...

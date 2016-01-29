@@ -21,7 +21,7 @@ P.Gamma8 = P.Jx/P.Gamma;
 P.pn0    =  0; % initial North position
 P.pe0    =  0; % initial East position
 P.pd0    =  0; % initial Down position (negative altitude)
-P.u0     =  0; % initial velocity along body x-axis
+P.u0     =  5; % initial velocity along body x-axis
 P.v0     =  0; % initial velocity along body y-axis
 P.w0     =  0; % initial velocity along body z-axis
 P.phi0   =  0; % initial roll angle
@@ -95,5 +95,5 @@ P.L_u = 200;
 P.L_v = 200;
 P.L_w = 50;
 
-P.Ts = .01;
+P.Ts = .1;
 
