@@ -35,7 +35,7 @@ function drawAircraft(uu,V,F,patchcolors)
         zlabel('-Down')
         view(32,47)  % set the vieew angle for figure
         %axis([-50,50,-50,50,-50,50]);
-        axis([pn-50, pn+50, pe-50, pe+50, pd-50, pd+50]);
+        axis([pn-50, pn+50, 
         hold on
         
     % at every other time step, redraw base and rod
@@ -74,7 +74,6 @@ function handle = drawVehicleBody(V,F,patchcolors,...
     set(handle,'Vertices',V','Faces',F);
     drawnow
   end
-  axis([pe-50, pe+50, pn-50, pn+50, -pd-50, -pd+50]);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%
