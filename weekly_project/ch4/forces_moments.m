@@ -36,17 +36,18 @@ function out = forces_moments(x, delta, wind, P)
     v_wg    = wind(5); % gust along body y-axis    
     w_wg    = wind(6); % gust along body z-axis
 
+    %Rotation from vehicle (inertial aligned) to body frame (eq. 2.5 on pg 15 of book)
     Rbv = [cos(theta)*cos(psi), cos(theta)*sin(psi), -sin(theta);...
         sin(phi)*sin(theta)*cos(psi)-cos(phi)*sin(psi), sin(phi)*sin(theta)*sin(psi)+cos(phi)*cos(psi), sin(phi)*cos(theta);...
         cos(phi)*sin(theta)*cos(psi)+sin(phi)*sin(psi), cos(phi)*sin(theta)*sin(psi)-sin(phi)*cos(psi), cos(phi)*cos(theta)];
     
     %wind gusts in the Body frame converted to NED frame (vehicle)
-    wind_gust_ned = Rbv'*wind(4:6)
+    wind_gust_ned = Rbv'*[u_wg; v_wg; w_wg];
     
     % compute wind data in NED
     w_n = w_ns + wind_gust_ned(1);
-    w_e = w_es + wind_gust_ned(1);
-    w_d = w_ds + wind_gust_ned(1);
+    w_e = w_es + wind_gust_ned(2);
+    w_d = w_ds + wind_gust_ned(3);
     
     %wind in NED converted to Body frame
     wind_body = Rbv*[w_n; w_e; w_d];
