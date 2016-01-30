@@ -6,7 +6,7 @@ P.mass = 13.5;  %kg
 P.Jx   = .8244; %kg*m^2
 P.Jy   = 1.135; %kg*m^2
 P.Jz   = 1.759; %kg*m^2
-P.Jxz  = 1.204; %kg*m^2
+P.Jxz  = .1204; %kg*m^2
 
 P.Gamma = (P.Jx*P.Jz) - (P.Jxz)^2;
 P.Gamma1 = (P.Jxz*(P.Jx - P.Jy + P.Jz))/P.Gamma;
@@ -22,7 +22,7 @@ P.Gamma8 = P.Jx/P.Gamma;
 P.pn0    =  0; % initial North position
 P.pe0    =  0; % initial East position
 P.pd0    =  0; % initial Down position (negative altitude)
-P.u0     =  5; % initial velocity along body x-axis
+P.u0     =  25; % initial velocity along body x-axis
 P.v0     =  0; % initial velocity along body y-axis
 P.w0     =  0; % initial velocity along body z-axis
 P.phi0   =  0; % initial roll angle
@@ -83,18 +83,18 @@ P.Cyd_r = -.17;
 P.Cld_r = .105;
 
 % Wind for Simulation
-P.wind_n = 0;
-P.wind_e = 0;
-P.wind_d = 0;
+P.wind_n = 5;
+P.wind_e = 2;
+P.wind_d = 3;
 
 %Other simulation data
-P.Va0 = 5;
-P.sigma_u = 0;%1.06;
-P.sigma_v = 0;%1.06;
-P.sigma_w = 0;%.7;
+P.Va0 = 25;
+P.sigma_u = 1.06;
+P.sigma_v = 1.06;
+P.sigma_w = .7;
 P.L_u = 200;
 P.L_v = 200;
 P.L_w = 50;
 
-P.Ts = .1;
+P.Ts = .01;
 
