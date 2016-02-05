@@ -6,7 +6,7 @@ function [T_phi_delta_a,T_chi_phi,T_theta_delta_e,T_h_theta,T_h_Va,T_Va_delta_t,
 
 Va_trim = x_trim(4);
 w_trim = x_trim(6);
-u_speed_trim = x_trim(4);
+u__trim = x_trim(4);
 theta_trim = x_trim(8);
 psi_trim = x_trim(9);
 
@@ -26,12 +26,11 @@ a_beta2 = ((-P.rho*Va_trim*P.S_wing)/(2*P.mass))*P.C_Y_delta_r;
 %pitch (pg. 73)
 a_theta1 = -(P.rho*(Va_trim)^2*P.c*P.S_wing/(2*P.Jy))*P.C_m_q*(P.c/(2*Va_trim));
 a_theta2 = -(P.rho*(Va_trim)^2*P.c*P.S_wing/(2*P.Jy))*P.C_m_alpha;
-a_theta3 = (P.rho*(Va_trim)^2*P.c*P.S_wing/(2*P.Jy))*P.C_m_delta_e;
 
 %airspeed (pg. 77)
-a_V1 = (P.rho*Va_trim*P.S_wing/P.mass)*(P.C_D_0 + P.C_D_alpha*atan(w_trim/u_speed_trim)...
+a_V1 = (P.rho*Va_trim*P.Swing/P.mass)*(P.C_D_0 + P.C_D_alpha*atan(w_trim/u_trim)...
     + P.C_D_delta_e*delta_e_trim) + (P.rho*P.S_prop/P.mass)*P.C_prop*Va_trim;
-a_V2 = (P.rho*P.S_prop/P.mass)*P.C_prop*((P.k_motor)^2)*delta_t_trim;
+a_V2 = (P.rho*P.S_prop/P.mass)*P.C_prop*((P.K_motor)^2)*delta_t_trim;
 a_V3 = P.gravity*cos(theta_trim - psi_trim);
     
 %% Define transfer functions

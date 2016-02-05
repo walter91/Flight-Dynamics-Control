@@ -99,8 +99,8 @@ P.C_r_delta_r = P.Gamma4*P.C_ell_delta_r + P.Gamma8*P.C_n_delta_r;
 
 %% compute trim conditions using 'mavsim_chap5_trim.slx'
 % initial airspeed
-P.Va0 = 17;
-gamma = 0*pi/180;  % desired flight path angle (radians)
+P.Va0 = 20;
+gamma = 25*pi/180;  % desired flight path angle (radians)
 R     = 100000000;         % desired radius (m) - use (+) for right handed orbit, 
 
 %% autopilot sample rate
@@ -153,6 +153,5 @@ A_lon_eig =  eig(A_lon);
 A_lat_eig =  eig(A_lat);
 
 Wn_lon_1 = A_lon_eig(1)*A_lon_eig(2)/(2*pi)
-%zeda_lon_1 = 
 
-Wn_lon_2 = A_lon_eig(3)*A_lon_eig(4)/(2*pi)
+Wn_lon_2 = A_lon_eig(3)*A_lon_eig(4)
