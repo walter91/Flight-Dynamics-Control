@@ -73,9 +73,9 @@ P.wind_d = 0;
 P.L_u = 200;
 P.L_v = 200;
 P.L_w = 50;
-P.sigma_u = 1.06; 
-P.sigma_v = 1.06;
-P.sigma_w = .7;
+P.sigma_u = 0; %1.06; 
+P.sigma_v = 0; %1.06;
+P.sigma_w = 0; %.7;
 
 %% Other Coefficients
 P.C_p_0     =   P.Gamma3*P.C_ell_0 +    P.Gamma4*P.C_n_0;
@@ -101,7 +101,7 @@ P.C_r_delta_r = P.Gamma4*P.C_ell_delta_r + P.Gamma8*P.C_n_delta_r;
 % initial airspeed
 P.Va0 = 17;
 gamma = 0*pi/180;  % desired flight path angle (radians)
-R     = 100000000;         % desired radius (m) - use (+) for right handed orbit, 
+R     = inf;         % desired radius (m) - use (+) for right handed orbit, 
 
 %% autopilot sample rate
 P.Ts = 0.01;
