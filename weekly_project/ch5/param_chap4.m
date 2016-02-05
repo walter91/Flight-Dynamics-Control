@@ -47,13 +47,13 @@ P.e = .9;       %unitless
 P.CLo = .28;
 P.Cdo = .03;
 P.Cmo = -0.02338;
-P.Cla = 3.45;
+P.CLa = 3.45;
 P.Cda = .30;
 P.Cma = -0.38;
-P.Clq = 0;
+P.CLq = 0;
 P.Cdq = 0;
 P.Cmq = -3.6;
-P.Cld_e = -.36;
+P.CLd_e = -.36;
 P.Cdd_e = 0;
 P.Cmd_e = -.5;
 P.Cprop = 1.0;
@@ -83,15 +83,15 @@ P.Cyd_r = -.17;
 P.Cld_r = .105;
 
 % Wind for Simulation
-P.wind_n = 5;
-P.wind_e = 2;
-P.wind_d = 3;
+P.wind_n = 0;
+P.wind_e = 0;
+P.wind_d = 0;
 
 %Other simulation data
 P.Va0 = 25;
-P.sigma_u = 1.06;
-P.sigma_v = 1.06;
-P.sigma_w = .7;
+P.sigma_u = 0;%1.06;
+P.sigma_v = 0;%1.06;
+P.sigma_w = 0;%.7;
 P.L_u = 200;
 P.L_v = 200;
 P.L_w = 50;

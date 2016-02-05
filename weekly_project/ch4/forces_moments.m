@@ -64,7 +64,7 @@ function out = forces_moments(x, delta, wind, P)
     beta = asin(v_r/(Va));
     
     %Linear Functions of Alpha
-    %Cl = P.Clo + P.Cla*alpha; %eq 4.12, pg. 49
+    %Cl = P.CLo + P.Cla*alpha; %eq 4.12, pg. 49
     %Cd = P.Cdo + P.Cda*alpha; %eq 4.13, pg. 49
     
     %Non-Linear Functions of Alpha
@@ -72,10 +72,10 @@ function out = forces_moments(x, delta, wind, P)
         + exp(P.M*(alpha + P.alpha0))) /...
         ((1 + exp(-P.M*(alpha - P.alpha0)))*(1 + exp(P.M*(alpha + P.alpha0)))); %eq. 4.10, pg. 47
     
-    Cl = (1 - sigma_alpha)*(P.Clo + P.Cla*alpha)...
+    Cl = (1 - sigma_alpha)*(P.CLo + P.Cla*alpha)...
         + sigma_alpha*(2*sign(alpha)*((sin(alpha))^2)*cos(alpha)); %eq. 4.9, pg. 47
     
-    Cd = P.Cdp + (((P.Clo + P.Cla*alpha)^2)/(pi*P.e*(((P.b)^2)/P.S)));  %eq. 4.11, pg. 48
+    Cd = P.Cdp + (((P.CLo + P.Cla*alpha)^2)/(pi*P.e*(((P.b)^2)/P.S)));  %eq. 4.11, pg. 48
     
     %Other Functions of Alpha, eq. 4.19, pg. 58
     Cx = -Cd*cos(alpha) + Cl*sin(alpha);
