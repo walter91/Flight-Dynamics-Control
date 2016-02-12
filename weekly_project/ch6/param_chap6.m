@@ -231,7 +231,7 @@ P.kp_v = (2*P.zeda_v*(P.omega_n_v - C.a_v_1))/C.a_v_2;
 
 %% Compute Altitude from Pitch Gains (section 6.4.2 pg. 108)
 
-P.omega_n_h = omega_n_theta/30;
+P.omega_n_h = omega_n_theta/20;
 P.zeda_h = .707;
 
 P.ki_h = (P.omega_n_h)^2/(P.K_theta_dc*P.Va0);
@@ -246,4 +246,7 @@ P.ki_v2 = -(P.omega_n_v2)^2/(P.K_theta_dc*P.gravity);
 P.kp_v2 = (C.a_v_1 - 2*P.zeda_v2*P.omega_n_v2)/(P.K_theta_dc*P.gravity);
 
 
-
+%% Autopilot Stuff
+P.takeOffPitch = deg2rad(30);
+P.altitude_take_off_zone = 30;
+P.altitude_hold_zone = 10;

@@ -36,7 +36,7 @@ function y = autopilot(uu,P)
     NN = NN+3;
     t        = uu(1+NN);   % time
     
-    autopilot_version = 1;
+    autopilot_version = 2;
         % autopilot_version == 1 <- used for tuning
         % autopilot_version == 2 <- standard autopilot defined in book
         % autopilot_version == 3 <- Total Energy Control for longitudinal AP
@@ -46,7 +46,7 @@ function y = autopilot(uu,P)
         case 2,
            [delta, x_command] = autopilot_uavbook(Va_c,h_c,chi_c,Va,h,chi,phi,theta,p,q,r,t,P);
         case 3,
-               [delta, x_command] = autopilot_TECS(Va_c,h_c,chi_c,Va,h,chi,phi,theta,p,q,r,t,P);
+           [delta, x_command] = autopilot_TECS(Va_c,h_c,chi_c,Va,h,chi,phi,theta,p,q,r,t,P);
     end
     y = [delta; x_command];
 end
@@ -64,7 +64,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [delta, x_command] = autopilot_tuning(Va_c,h_c,chi_c,Va,h,chi,phi,theta,p,q,r,t,P)
 
-    mode = 4;
+    mode = 5;
     switch mode
         case 1, % tune the roll loop
             phi_c = chi_c; % interpret chi_c to autopilot as course command
@@ -102,12 +102,12 @@ function [delta, x_command] = autopilot_tuning(Va_c,h_c,chi_c,Va,h,chi,phi,theta
             if t==0,
                 flag = 1;
                 phi_c   = course_hold(chi_c, chi, r, flag, P);
-                delta_t = airspeed_with_throttle_hold(Va_c, Va, P.u_trim(4), flag, P);
+                delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P);
                 delta_a = roll_hold(phi_c, phi, p, flag, P);
             else
                flag = 0;
                 phi_c   = course_hold(chi_c, chi, r, flag, P);
-                delta_t = airspeed_with_throttle_hold(Va_c, Va, P.u_trim(4), flag, P);
+                delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P);
                 delta_a = roll_hold(phi_c, phi, p, flag, P);
             end
             delta_e = pitch_hold(theta_c, theta, q, P);
@@ -138,13 +138,13 @@ function [delta, x_command] = autopilot_tuning(Va_c,h_c,chi_c,Va,h,chi,phi,theta
                 flag = 1;
                 phi_c   = course_hold(chi_c, chi, r, 1, P);
                 theta_c = altitude_hold(h_c, h, 1, P);
-                delta_t = airspeed_with_throttle_hold(Va_c, Va, P.u_trim(4), flag, P);
+                delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P);
                 delta_a = roll_hold(phi_c, phi, p, 1, P);
             else
                flag = 0;
                 phi_c   = course_hold(chi_c, chi, r, 0, P);
                 theta_c = altitude_hold(h_c, h, 0, P);
-                delta_t = airspeed_with_throttle_hold(Va_c, Va, P.u_trim(4), flag, P);
+                delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P);
                 delta_a = roll_hold(phi_c, phi, p, 0, P);
             end
             
@@ -218,24 +218,46 @@ function [delta, x_command] = autopilot_uavbook(Va_c,h_c,chi_c,Va,h,chi,phi,thet
         initialize_integrator = 1;
     end
     
+    disp(altitude_state);
+    
+    if(t == 0)
+        flag = 1;
+    else
+        flag = 0;
+    end
+    
     % implement state machine
     switch altitude_state,
         case 1,  % in take-off zone
+            theta_c = P.takeOffPitch;
+            delta_e = pitch_hold(theta_c, theta, q, P);
+            delta_t = 1;
             
         case 2,  % climb zone
-             
+            theta_c = airspeed_with_pitch_hold(Va_c, Va, flag, P);
+            delta_e = pitch_hold(theta_c, theta, q, P);
+            delta_t = 1;
+            
         case 3, % descend zone
-
+            theta_c = airspeed_with_pitch_hold(Va_c, Va, flag, P);
+            delta_e = pitch_hold(theta_c, theta, q, P);
+            delta_t = 0;
+            
         case 4, % altitude hold zone
+            [theta_c] = altitude_hold(h_c, h, flag, P);
+            delta_e = pitch_hold(theta_c, theta, q, P);
+            delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P);
     end
     
-    delta_e = pitch_hold(theta_c, theta, q, P);
+    
     % artificially saturation delta_t
     delta_t = sat(delta_t,1,0);
- 
+    delta_r = 0;
     
     %----------------------------------------------------------
     % create outputs
+    
+    
     
     % control outputs
     delta = [delta_e; delta_a; delta_r; delta_t];
@@ -430,7 +452,7 @@ end
 
 %% Airspeed from Throttle Control (PI controller from trim)
 
-function delta_t = airspeed_with_throttle_hold(Va_c, Va, delta_t_trim, flag, P)
+function delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P)
 
 
 persistent integrator
@@ -450,7 +472,7 @@ end
 
 error_d1 = error;
 
-delta_t = delta_t_trim + P.kp_v*error + P.ki_v*integrator;
+delta_t = P.u_trim(4) + P.kp_v*error + P.ki_v*integrator;
 
 delta_t = sat(delta_t, P.delta_t_max, 0);
 
