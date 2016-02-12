@@ -101,7 +101,7 @@ P.C_r_delta_r = P.Gamma4*P.C_ell_delta_r + P.Gamma8*P.C_n_delta_r;
 % initial airspeed
 P.Va0 = 17;
 gamma = 0*pi/180;  % desired flight path angle (radians)
-R     = inf;         % desired radius (m) - use (+) for right handed orbit, 
+R     = 500;         % desired radius (m) - use (+) for right handed orbit, 
 
 %% autopilot sample rate
 P.Ts = 0.01;
