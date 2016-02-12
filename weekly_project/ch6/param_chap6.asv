@@ -158,7 +158,7 @@ Wn_lon_2 = A_lon_eig(3)*A_lon_eig(4)/(2*pi);
 
 %% Compute roll-attitude gains
 P.delta_a_max = deg2rad(45);
-P.e_phi_max = deg2rad(60);
+P.e_phi_max = deg2rad(30);
 P.zeda_phi = 1.0;
 
 P.kp_phi = (P.delta_a_max/P.e_phi_max)*sign(C.a_phi_2);

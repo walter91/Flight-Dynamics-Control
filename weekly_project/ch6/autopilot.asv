@@ -6,7 +6,6 @@ function y = autopilot(uu,P)
 %   2/11/2010 - RWB
 %   5/14/2010 - RWB
 %   9/30/2014 - RWB
-%   2/12/2016 - WMC
    
 
     % process inputs
@@ -183,20 +182,22 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [delta, x_command] = autopilot_uavbook(Va_c,h_c,chi_c,Va,h,chi,phi,theta,p,q,r,t,P)
 
-    if(t == 0)
-        flag = 1;
-    else
-        flag = 0;
-    end
-
     %----------------------------------------------------------
     % lateral autopilot
-  
+    if t==0,
         % assume no rudder, therefore set delta_r=0
         delta_r = 0;%coordinated_turn_hold(beta, 1, P);
-        phi_c   = course_hold(chi_c, chi, r, flag, P);
-        delta_a = roll_hold(phi_c, phi, p, flag, P);
-   
+        phi_c   = course_hold(chi_c, chi, r, 1, P);
+        delta_a = roll_hold(phi_c, phi, p, 1, P);
+
+    else
+        phi_c   = course_hold(chi_c, chi, r, 0, P);
+        delta_r = 0;%coordinated_turn_hold(beta, 0, P);
+        delta_a = roll_hold(phi_c, phi, p, 0, P);
+    end
+        
+  
+    
     %----------------------------------------------------------
     % longitudinal autopilot
     
@@ -217,8 +218,13 @@ function [delta, x_command] = autopilot_uavbook(Va_c,h_c,chi_c,Va,h,chi,phi,thet
         initialize_integrator = 1;
     %end
     
-    %disp(altitude_state);
-      
+    disp(altitude_state);
+    
+    if(t == 0)
+        flag = 1;
+    else
+        flag = 0;
+    end
     
     % implement state machine
     switch altitude_state,
@@ -226,7 +232,6 @@ function [delta, x_command] = autopilot_uavbook(Va_c,h_c,chi_c,Va,h,chi,phi,thet
             theta_c = P.takeOffPitch;
             delta_e = pitch_hold(theta_c, theta, q, P);
             delta_t = 1;
-            delta_a = roll_hold(0, phi, p, flag, P);
             
         case 2,  % climb zone
             theta_c = airspeed_with_pitch_hold(Va_c, Va, flag, P);
@@ -407,9 +412,9 @@ error_d1 = error;
 %calculate control varible
 phi_c = ...
     P.kp_chi*error +...
-    P.ki_chi*integrator - .25*r;
+    P.ki_chi*integrator - .5*r;
 
-phi_c = sat(phi_c, deg2rad(35), deg2rad(-35));
+phi_c = sat(phi_c, deg2rad(30), deg2rad(-30));
 
 %delta_a = sat(delta_a, P.delta_a_max, -P.delta_a_max); 
 
