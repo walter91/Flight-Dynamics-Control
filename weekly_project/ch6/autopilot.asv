@@ -64,7 +64,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [delta, x_command] = autopilot_tuning(Va_c,h_c,chi_c,Va,h,chi,phi,theta,p,q,r,t,P)
 
-    mode = 4;
+    mode = 5;
     switch mode
         case 1, % tune the roll loop
             phi_c = chi_c; % interpret chi_c to autopilot as course command
@@ -470,8 +470,9 @@ delta_e = sat(delta_e, P.delta_e_max, -P.delta_e_max);
 
 end
 
-%% Altitude Hold from Pitch(PI Controller)
+%% Altitude Hold (PI Controller)
 function [theta_c] = altitude_hold(h_c, h, flag, P)
+
 
 persistent integrator;
 persistent error_d1;
@@ -503,36 +504,9 @@ theta_c = sat(theta_c, deg2rad(30), deg2rad(-3));
 
 end
 
-%% Airspeed from Pitch Control (PI Controller)
 function theta_c = airspeed_with_pitch_hold(Va_c, Va, flag, P)
 
 
-persistent integrator;
-persistent error_d1;
-
-%initialize persistent variables...
-if (flag ==1)
-    integrator = 0;
-    error_d1 = 0;
-end
-
-error = Va_c - Va;
-
-%anti-windup + integrator
-if (abs(error) < 3.5)
-    integrator = integrator + (P.Ts/2)*(error + error_d1);
-else
-    integrator = 0;
-end
-
-error_d1 = error;
-
-%calculate control varible
-theta_c = ...
-    P.kp_v2*error +...
-    P.ki_v2*integrator;
-
-theta_c = sat(theta_c, deg2rad(30), deg2rad(-3));
 
 end
 

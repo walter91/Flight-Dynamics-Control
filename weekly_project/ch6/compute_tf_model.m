@@ -1,4 +1,4 @@
-function [T_phi_delta_a,T_chi_phi,T_theta_delta_e,T_h_theta,T_h_Va,T_Va_delta_t,T_Va_theta,T_v_delta_r]...
+function [T_phi_delta_a,T_chi_phi,T_theta_delta_e,T_h_theta,T_h_Va,T_Va_delta_t,T_Va_theta,T_v_delta_r, C]...
     = compute_tf_model(x_trim,u_trim,P)
 %% Map Inputs
 % x_trim is the trimmed state,
@@ -34,7 +34,21 @@ a_V1 = (P.rho*Va_trim*P.S_wing/P.mass)*(P.C_D_0 + P.C_D_alpha*atan(w_trim/u_spee
     + P.C_D_delta_e*delta_e_trim) + (P.rho*P.S_prop/P.mass)*P.C_prop*Va_trim;
 a_V2 = (P.rho*P.S_prop/P.mass)*P.C_prop*((P.k_motor)^2)*delta_t_trim;
 a_V3 = P.gravity*cos(theta_trim - psi_trim);
-    
+
+%% Contants Struct
+
+C.a_phi_1 = a_phi1;
+C.a_phi_2 = a_phi2;
+C.a_beta_1 = a_beta1;
+C.a_beta_2 = a_beta2;
+C.a_theta_1 = a_theta1;
+C.a_theta_2 = a_theta2;
+C.a_theta_3 = a_theta3;
+C.a_v_1 = a_V1;
+C.a_v_2 = a_V2;
+C.a_v_3 = a_V3;
+
+
 %% Define transfer functions
 T_phi_delta_a   = tf([a_phi2],[1,a_phi1,0]);
 T_chi_phi       = tf([P.gravity/Va_trim],[1,0]);

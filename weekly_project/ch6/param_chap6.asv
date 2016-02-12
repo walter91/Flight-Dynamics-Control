@@ -240,10 +240,8 @@ P.kp_h = (2*P.zeda_h*P.omega_n_h)/(P.K_theta_dc*P.Va0);
 %% Airspeed from Pitch Gains  (section 6.4.3 pg. 110)
 
 P.omega_n_v2 = omega_n_theta/10;
-P.zeda_v2 = .707;
 
-P.ki_v2 = -(P.omega_n_v2)^2/(P.K_theta_dc*P.gravity);
-P.kp_v2 = (C.a_v_1 - 2*P.zeda_v2*P.omega_n_v2)/(P.K_theta_dc*P.gravity);
+P.ki_v2 = -(P.omega_n_v2)^2
 
 
 
