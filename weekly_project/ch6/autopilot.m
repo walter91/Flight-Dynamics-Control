@@ -11,8 +11,8 @@ function y = autopilot(uu,P)
 
     % process inputs
     NN = 0;
-%    pn       = uu(1+NN);  % inertial North position
-%    pe       = uu(2+NN);  % inertial East position
+    pn       = uu(1+NN);  % inertial North position
+    pe       = uu(2+NN);  % inertial East position
     h        = uu(3+NN);  % altitude
     Va       = uu(4+NN);  % airspeed
 %    alpha    = uu(5+NN);  % angle of attack
@@ -37,7 +37,7 @@ function y = autopilot(uu,P)
     NN = NN+3;
     t        = uu(1+NN);   % time
     
-    autopilot_version = 2;
+    autopilot_version = 4;
         % autopilot_version == 1 <- used for tuning
         % autopilot_version == 2 <- standard autopilot defined in book
         % autopilot_version == 3 <- Total Energy Control for longitudinal AP
@@ -48,6 +48,8 @@ function y = autopilot(uu,P)
            [delta, x_command] = autopilot_uavbook(Va_c,h_c,chi_c,Va,h,chi,phi,theta,p,q,r,t,P);
         case 3,
            [delta, x_command] = autopilot_TECS(Va_c,h_c,chi_c,Va,h,chi,phi,theta,p,q,r,t,P);
+        case 4,
+           [delta, x_command] = autopilot_points(pn, pe, Va, h, chi,phi,theta,p,q,r,t,P);
     end
     y = [delta; x_command];
 end
@@ -569,5 +571,89 @@ function out = sat(in, up_limit, low_limit)
       out = in;
   end
 end
-  
+
+
+
+function [delta, x_command] = autopilot_points(pn, pe, Va, h, chi,phi,theta,p,q,r,t,P)
+   
+    %N, E, H
+    points = [1600, 0, 500;...
+              2500, 0, 800;
+              3500, 500,800 ];
+     
+    persistent STATE;
+    
+    if(t==0)
+        STATE = 0;
+        flag = 1;
+    else
+        flag = 0;
+    end
+    
+    switch STATE
+        case 0,
+            Va_c = 35;
+            h_c = points(1, 3);
+            chi_c = get_chi(points(1, :), [pn pe h]);
+            pn_c = points(1,1);
+            pe_c = points(1,2);
+        case 1,
+            Va_c = 35;
+            h_c = points(2, 3);
+            chi_c = get_chi(points(2, :), [pn pe h]);
+            pn_c = points(2,1);
+            pe_c = points(2,2);
+        case 2,
+            Va_c = 35;
+            h_c = points(3, 3);
+            chi_c = get_chi(points(3, :), [pn pe h]);
+            pn_c = points(3,1);
+            pe_c = points(3,2);
+        case 3,
+            disp('simulation over');
+    end
+    
+    if( sqrt((pn_c-pn)^2 + (pe_c-pe)^2 + (h_c-h)^2) < 10)
+        STATE = STATE + 1;
+        disp('Marker Hit');
+    end
+    delta_r = 0;%coordinated_turn_hold(beta, 1, P);
+    phi_c   = course_hold(chi_c, chi, r, flag, P);
+    delta_a = roll_hold(phi_c, phi, p, flag, P);
+    
+    theta_c = altitude_hold(h_c, h, flag, P);
+    delta_e = pitch_hold(theta_c, theta, q, P);
+    delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P);
+    
+    % control outputs
+    delta = [delta_e; delta_a; delta_r; delta_t];
+    % commanded (desired) states
+    x_command = [...
+        pn_c;...                    % pn
+        pe_c;...                    % pe
+        h_c;...                  % h
+        Va_c;...                 % Va
+        0;...                    % alpha
+        0;...                    % beta
+        phi_c;...                % phi
+        %theta_c*P.K_theta_DC;... % theta
+        theta_c;
+        chi_c;...                % chi
+        0;...                    % p
+        0;...                    % q
+        0;...                    % r
+        ];
+end
+
+function chi = get_chi(nextPoint, currentLocation)
+ 
+pn_c = nextPoint(1);
+pe_c = nextPoint(2);
+pn = currentLocation(1);
+pe = currentLocation(2);
+
+
+chi = -(atan2(pn_c - pn, pe_c - pe) - (pi/2));
+
+end
  
