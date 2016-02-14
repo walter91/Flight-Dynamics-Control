@@ -37,7 +37,7 @@ function y = autopilot(uu,P)
     NN = NN+3;
     t        = uu(1+NN);   % time
     
-    autopilot_version = 2;
+    autopilot_version = 4;
         % autopilot_version == 1 <- used for tuning
         % autopilot_version == 2 <- standard autopilot defined in book
         % autopilot_version == 3 <- Total Energy Control for longitudinal AP
@@ -574,7 +574,7 @@ end
 
 
 
-function [delta, x_command] = autopilot_points(pn, pe, Va, h, chi,phi,theta,p,q,r,t,P)
+function [delta, x_command] = autopilot_points(pn, pe, Va, h, chi, phi, theta, p, q, r, t, P)
    
     %N, E, H
     points = [500, 0, 200;...
@@ -582,8 +582,11 @@ function [delta, x_command] = autopilot_points(pn, pe, Va, h, chi,phi,theta,p,q,
               900, 200, 200;...
               200, 1500, 200;...
               0, 1900, 200;...
-              -100, 1950, 200;...
-              -300, 1900, 200];
+              -400, 1950, 200;...
+              -800, 1950, 200;...
+              -1000, 1950, 250;...
+              -1200, 1950, 250;...
+              -1600, 1930, 200];
      
     persistent STATE;
     
@@ -594,33 +597,18 @@ function [delta, x_command] = autopilot_points(pn, pe, Va, h, chi,phi,theta,p,q,
         flag = 0;
     end
     
-    %switch STATE
-     %   case 0,
-            Va_c = 35;
-            h_c = points(STATE+1, 3);
-            chi_c = get_chi(points(STATE+1, :), [pn pe h]);
-            if(chi_c > deg2rad(180))
-                chi_c = chi_c - deg2rad(360);
-            elseif(chi_c < deg2rad(-180))
-                chi_c = chi_c + deg2rad(360);
-            end
-            pn_c = points(STATE+1,1);
-            pe_c = points(STATE+1,2);
-%         case 1,
-%             Va_c = 35;
-%             h_c = points(2, 3);
-%             chi_c = get_chi(points(2, :), [pn pe h]);
-%             pn_c = points(2,1);
-%             pe_c = points(2,2);
-%         case 2,
-%             Va_c = 35;
-%             h_c = points(3, 3);
-%             chi_c = get_chi(points(3, :), [pn pe h]);
-%             pn_c = points(3,1);
-%             pe_c = points(3,2);
-%         case 3,
-%             disp('simulation over');
-%     end
+
+    Va_c = 35;
+    h_c = points(STATE+1, 3);
+
+    chi_c = get_chi(points(STATE+1, :), [pn pe h]);
+    if(chi_c > deg2rad(90) && (chi < deg2rad(-90)))
+        chi = deg2rad(360) + chi;
+    elseif(chi_c < deg2rad(-90) && (chi > deg2rad(90)))
+        chi = -deg2rad(360) - chi;
+    end
+    pn_c = points(STATE+1,1);
+    pe_c = points(STATE+1,2);
     
     if( sqrt((pn_c-pn)^2 + (pe_c-pe)^2 + (h_c-h)^2) < 10)
         STATE = STATE + 1;
