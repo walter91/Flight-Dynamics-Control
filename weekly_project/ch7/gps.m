@@ -35,8 +35,8 @@ function y = gps(uu, P)
     y_gps_h = ; 
     
     % construct groundspeed and course measurements
-    y_gps_Vg     = ;
-    y_gps_course = ;
+    y_gps_Vg     = sqrt((Va*cos(psi) + wn)^2 + (Va*sin(psi) + we)^2) + .05*randn();
+    y_gps_course = atan2(Va*sin(psi) + we, Va*cos(psi) + wn) + (.05/y_gps_Vg)*randn();
 
     % construct total output
     y = [...
