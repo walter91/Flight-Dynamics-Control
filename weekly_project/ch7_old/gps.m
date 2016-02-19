@@ -28,33 +28,15 @@ function y = gps(uu, P)
 %    r       = uu(18);
     t       = uu(19);
     
-    persistent nu_n_0;
-    persistent nu_e_0;
-    persistent nu_h_0;
-    
-    if(isempty(nu_n_0))
-       nu_n_0 = 0;
-       nu_e_0 = 0;
-       nu_h_0 = 0;
-    end
-    
  
-    nu_n_1 = exp(-(1/1100)*P.Ts_gps)*nu_n_0 + normrnd(0, .21);
-    nu_e_1 = exp(-(1/1100)*P.Ts_gps)*nu_n_0 + normrnd(0, .21);
-    nu_h_1 = exp(-(1/1100)*P.Ts_gps)*nu_n_0 + normrnd(0, .4);
-    
-    nu_n_0 = nu_n_1;
-    nu_e_0 = nu_e_1;
-    nu_h_0 = nu_h_1;
-    
     % construct North, East, and altitude GPS measurements
-    y_gps_n = pn + nu_n_0;
-    y_gps_e = pe + nu_e_0; 
-    y_gps_h = -pd + nu_h_0; 
+    y_gps_n = ;
+    y_gps_e = ; 
+    y_gps_h = ; 
     
     % construct groundspeed and course measurements
-    y_gps_Vg     = sqrt((Va*cos(psi) + wn)^2 + (Va*sin(psi) + we)^2) + normrnd(0, .21);
-    y_gps_course = atan2(Va*sin(psi) + we, Va*cos(psi) + wn) + normrnd(0, .21/y_gps_Vg);
+    y_gps_Vg     = sqrt((Va*cos(psi) + wn)^2 + (Va*sin(psi) + we)^2) + .05*randn();
+    y_gps_course = atan2(Va*sin(psi) + we, Va*cos(psi) + wn) + (.05/y_gps_Vg)*randn();
 
     % construct total output
     y = [...
