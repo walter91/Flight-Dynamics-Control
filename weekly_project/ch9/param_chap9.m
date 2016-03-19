@@ -70,8 +70,8 @@ P.epsilon       = 0.1592;
 P.alpha0        = 0.4712;
 
 % wind parameters
-P.wind_n = 3;
-P.wind_e = 2;
+P.wind_n = 0;%3;
+P.wind_e = 0;%2;
 P.wind_d = 0;
 P.L_u = 200;
 P.L_v = 200;
@@ -412,3 +412,20 @@ P.sigma_V = 0.04; %m/s
 P.sigma_course = 3*pi/180; %rad
 P.K_gps_inv = 1100;
 P.Ts_gps = 1;
+
+
+%% Guidance Models
+P.b_chidot = 1.7;
+P.b_chi = .7;
+P.b_h = 1.2;
+P.b_hdot = 1.08;
+P.b_Va = 2.2;
+P.b_phi = 1;
+
+% %% GUIDANCE MODEL, from Michael Boren...
+% P.b_chidot = 2.1;
+% P.b_chi = 3.5;
+% P.b_hdot = 0.8;
+% P.b_h = 1.8;
+% P.b_Va = 2.2;
+% P.b_phi = 1;

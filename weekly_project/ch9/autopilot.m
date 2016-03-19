@@ -67,7 +67,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [delta, x_command] = autopilot_tuning(Va_c,h_c,chi_c,Va,h,chi,phi,theta,p,q,r,t,P)
 
-    mode = 2;
+    mode = 5;
     switch mode
         case 1, % tune the roll loop
             phi_c = chi_c; % interpret chi_c to autopilot as course command
@@ -154,6 +154,24 @@ function [delta, x_command] = autopilot_tuning(Va_c,h_c,chi_c,Va,h,chi,phi,theta
             delta_e = pitch_hold(theta_c, theta, q, P);
             delta_r = 0; % no rudder
             % use trim values for elevator and throttle while tuning the lateral autopilot
+        case 6
+            phi_c = chi_c;
+            chi_c = 0;
+            if t==0,
+                flag = 1;
+                delta_a = roll_hold(phi_c, phi, p, flag, P);   %chi_c will be filled in like it is phi_c in simulink
+                theta_c = altitude_hold(h_c, h, flag, P);
+                delta_e = pitch_hold(theta_c, theta, q, P);
+                delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P);
+            else
+                flag = 0;
+                delta_a = roll_hold(phi_c, phi, p, flag, P);   %chi_c will be filled in like it is phi_c in simulink
+                theta_c = altitude_hold(h_c, h, flag, P);
+                delta_e = pitch_hold(theta_c, theta, q, P);
+                delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P);
+            end
+            delta_r = 0; % no rudder
+                
       end
     %----------------------------------------------------------
     % create outputs
@@ -263,7 +281,7 @@ persistent flag;
             delta_e = pitch_hold(theta_c, theta, q, P);
             delta_t = airspeed_with_throttle_hold(Va_c, Va, flag, P);
             
-            flag - 0;
+            flag = 0;
             if h<=h_c-P.altitude_hold_zone, 
             altitude_state = 2;
             flag = 1;

@@ -125,30 +125,35 @@ function sys=mdlDerivatives(t,x,u,P)
   h_c    = u(2); % commanded altitude
   chi_c  = u(3); % commanded heading angle
   
-  chidot_c = 0;
-  hdot_c = 0;
   
+  hdot_c = 0;
   psi = chi - asin( (-P.wind_n*sin(chi)+P.wind_e*cos(chi))/Va );
   
-  pndot = Va*cos(chi) + P.wind_n;
-  pedot = Va*sin(chi) + P.wind_e;
+  Vg  = [cos(chi), sin(chi)]*(Va*[cos(psi); sin(psi)] + [P.wind_n; P.wind_e]); 
+  phi     = atan(Vg*chidot/P.gravity);
+   
   
-  chiddot = P.b_chidot*(chidot_c - chidot) + P.b_chi*(chi_c - chi);
+  psidot = (P.gravity/Va)*tan(phi);
   
+  pndot = Va*cos(psi) + P.wind_n;
+  pedot = Va*sin(psi) + P.wind_e;
+    
   hddot = P.b_hdot*(hdot_c - hdot) + P.b_h*(h_c - h);
   
   Vadot = P.b_Va*(Va_c - Va);
+  
+  phidot = P.b_phi*(chi_c - phi);
   
   
   
 sys = [...
     pndot;...
     pedot;...
-    chidot;...
-    chiddot;...
+    psidot;...
     hdot;...
     hddot;...
     Vadot;...
+    phidot...
     ];
 
 % end mdlDerivatives
