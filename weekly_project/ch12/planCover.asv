@@ -3,7 +3,7 @@
 %%  
 %% Last Modified - 11/15/2010 - R. Beard
 
-function path=planCover(wpp_start, map, R_min)
+function path=planCover(wpp_start, map)
     
     % desired down position is down position of start node
     pd = wpp_start(3);
@@ -22,7 +22,7 @@ function path=planCover(wpp_start, map, R_min)
     SEARCH_CYCLES = 50;  % number of search cycles
        
     % look ahead tree parameters
-    L = 2.2*R_min;  % segment Length
+    L = 50;  % segment Length
     vartheta = pi/4; % search angle
     depth = 5; % depth of look ahead tree
     

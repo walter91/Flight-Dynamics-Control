@@ -1,6 +1,9 @@
 % path_manager_dubins 
 %   - follow Dubins paths between waypoint configurations
 %
+% NOTE: LINE 201, INSERTED PAUSE FOR SIMULATION PURPOSES WHEN END POINT IS
+% REACHED.
+%
 % input is:
 %   num_waypoints - number of waypoint configurations
 %   waypoints    - an array of dimension 5 by P.size_waypoint_array.
@@ -84,13 +87,13 @@ function out = path_manager_dubins(in,P,start_of_simulation)
   % define transition state machine
   switch state_transition,
       case 0, % beginning of simulation
-          flag   = 1; %2;
+          flag   = 1;
           Va_d   = 35;
-          r      = dubinspath.w1; %[0; 0; 0];
-          q      = dubinspath.q1; %[0; 0; 0];
-          c      = [0; 0; 0]; %dubinspath.cs;
-          rho    = 0; %dubinspath.R;
-          lambda = 0; %dubinspath.lams;
+          r      = dubinspath.w1;
+          q      = dubinspath.q1;
+          c      = [0; 0; 0];
+          rho    = 0;
+          lambda = 0;
           if flag_first_time_in_state,
               flag_first_time_in_state =0;
           end
@@ -133,7 +136,7 @@ function out = path_manager_dubins(in,P,start_of_simulation)
       case 3, % follow straight line on Dubins path until intersect H2
           flag   = 1;  % following straight line path
           Va_d   = 35; % desired airspeed along waypoint path
-          r      = dubinspath.w1; %dubinspath.w1;
+          r      = dubinspath.w1;
           q      = dubinspath.q1;
           c      = dubinspath.cs;
           rho    = dubinspath.R;
@@ -148,8 +151,8 @@ function out = path_manager_dubins(in,P,start_of_simulation)
       case 4, % follow second orbit on Dubins path until intersect H3
           flag   = 2;  % following orbit
           Va_d   = 35; % desired airspeed along waypoint path
-          r      = dubinspath.w1; %[0; 0; 0];
-          q      = dubinspath.q1; %[0; 0; 0];
+          r      = dubinspath.w1;
+          q      = dubinspath.q1;
           c      = dubinspath.ce;
           rho    =dubinspath.R;
           lambda = dubinspath.lame;
@@ -180,11 +183,11 @@ function out = path_manager_dubins(in,P,start_of_simulation)
       case 5, % follow first orbit on Dubins path until on right side of H3
           flag   = 2;  % following orbit
           Va_d   = 35; % desired airspeed along waypoint path
-          r      = dubinspath.w1; %[0; 0; 0];
-          q      = dubinspath.q1; %[0; 0; 0];
-          c      = dubinspath.ce; %dubinspath.cs;
+          r      = dubinspath.w1;
+          q      = dubinspath.q1;
+          c      = dubinspath.ce; % should this be cs?
           rho    = dubinspath.R;
-          lambda = dubinspath.lame; %dubinspath.lams;
+          lambda = dubinspath.lame;
           flag_first_time_in_state = 0;
           
           if (p-dubinspath.w3)'*dubinspath.q3 < 0, % get to right side of H3
@@ -195,6 +198,11 @@ function out = path_manager_dubins(in,P,start_of_simulation)
           end
           
               
+  end
+  
+  % For simulation purposes, pause when end point is reached
+  if flag_need_new_waypoints,
+      pause
   end
   
   out = [flag; Va_d; r; q; c; rho; lambda; state; flag_need_new_waypoints];

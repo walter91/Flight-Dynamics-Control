@@ -51,9 +51,9 @@ function drawEnvironment(uu,P)
         xlabel('East')
         ylabel('North')
         zlabel('-Down')
-        axis([-S/5,S,-S/5,S,0,3*P.map.MaxHeight]);
-%         view(-40,70)  % set the view angle for figure
-         view(0,90)
+%         axis([-S/5,S,-S/5,S,0,3*P.map.MaxHeight]);
+        axis([-S/5,S,-S/5,S,0,300]);
+        view(-40,70)  % set the view angle for figure
         grid on
         
         

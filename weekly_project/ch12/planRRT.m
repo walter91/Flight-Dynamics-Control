@@ -205,6 +205,7 @@ function plotmap(map,path,smoothedPath,tree)
     xlabel('E')
     ylabel('N')
     zlabel('h')
+    view([0,90])
     hold on
   
     % plot buildings 

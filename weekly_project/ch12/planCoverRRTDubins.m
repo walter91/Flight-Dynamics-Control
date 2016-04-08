@@ -3,18 +3,18 @@
 %%  
 %% Last Modified - 11/15/2010 - R. Beard
 
-function path=planCover(wpp_start, map, R_min)
+function path=planCoverRRTDubins(wpp_start, R_min, map)
     
     % desired down position is down position of start node
     pd = wpp_start(3);
     
     % specify start node from wpp_start 
-    start_node = [wpp_start(1), wpp_start(2), pd, wpp_start(4), 0, 0];
+    start_node = [wpp_start(1), wpp_start(2), pd, 0, 0, 0];
     % format is [N, E, D, chi, cost, parent]
  
  
     % return map
-    returnMapSize = 30;  % this is a critical parameter!
+    returnMapSize = 12;  % this is a critical parameter!
     return_map = 50*ones(returnMapSize,returnMapSize)+ rand(returnMapSize,returnMapSize);
     plotReturnMap(return_map), %pause
 
@@ -29,7 +29,7 @@ function path=planCover(wpp_start, map, R_min)
     % initialize path and tree
     path = start_node;
     for i=1:SEARCH_CYCLES,
-        tree = extendTree(path(end,:),L,vartheta,depth,map,return_map,pd);
+        tree = extendTree(path(end,:),L,depth,map,return_map,pd,R_min);
         next_path = findMaxReturnPath(tree);
         path = [path; next_path(1,:)];
         % update the return map
@@ -48,9 +48,9 @@ function path=planCover(wpp_start, map, R_min)
     end
         
     % specify that these are straight-line paths.
-    for i=1:size(path,1),
-        path(i,4)=-9999; 
-    end
+%     for i=1:size(path,1),
+%         path(i,4)=-9999; 
+%     end
 
 end
 
@@ -58,41 +58,60 @@ end
 %% extendTree
 %%   extend tree by randomly selecting point and growing tree toward that
 %%   point
-function tree = extendTree(start_node,L,vartheta,depth,map,return_map,pd)
+function tree = extendTree(start_node,L,depth,map,return_map,pd,R_min)
 
-  tree_ = [start_node, 0];  % the last variable marks node as expanded
+    tree_ = [start_node, 0]; % last variable marks node as expanded
+    
+    % extend tree
+    for d = 1:depth,
+        newnodes = [];
+        for j=1:size(tree_,1),
+            if tree_(j,7)~=1, % expand unexpanded nodes
+                for i=1:3,
+                    flag=0;
+                    count = 0;
+                    while flag==0,
+                        %select a random point
+                        randomNode = generateRandomNode(map,pd);
+                        tmp = randomNode(1:3)-tree_(j,1:3);
+                        new_point = tree_(j,1:3) + L*tmp/norm(tmp);
+                        chi = -(atan2(tmp(1),tmp(2)) - pi/2);
+                        
+                        newpath = dubinsParameters(tree_(j,:), [new_point,chi,0,0], R_min);
+                        if ~isempty(newpath),
+                            cost = tree_(j,5) + findReturn(new_point(1),new_point(2),return_map,map);
+                            newnode_ = [new_point, chi, cost, j, 0];
+                            if collision(newpath, pd, map)==0,
+                                newnodes = [newnodes; newnode_];
+                                flag=1;
+                            end
+                        end
+                        if count > 5,
+                            flag = 1;
+                        end
+                        count = count+1;
+                    end
+                end
+                tree_(j,7)=1;
+            end
+        end
+        tree_ = [tree_; newnodes];
+    end
+    tree = tree_(:,1:6);         
 
-  % extend tree initially
-  for d = 1:depth,
-      newnodes = [];
-      for j=1:size(tree_,1),
-          if tree_(j,7)~=1, % process unexpanded nodes
-              for i=1:3,
-                  if     i==1, theta = tree_(j,4)-vartheta;
-                  elseif i==2, theta = tree_(j,4);
-                  elseif i==3, theta = tree_(j,4)+vartheta;
-                  end
-                  newnode_ = [...
-                      tree_(j,1)+L*cos(theta),...
-                      tree_(j,2)+L*sin(theta),...
-                      tree_(j,3),...
-                      theta,...
-                      0,...
-                      j,...
-                      0,...
-                      ];
-                  if collision(tree_(j,:), newnode_, map)==0,
-                      newnode_(5) = tree_(j,5)...
-                          +findReturn(newnode_(1),newnode_(2),return_map,map);
-                      newnodes = [newnodes; newnode_];
-                  end
-              end
-              tree_(j,7)=1; % mark as expanded
-          end
-      end
-      tree_ = [tree_; newnodes];
-  end
-  tree = tree_(:,1:6);
+end
+
+% Generate Random Node
+function node=generateRandomNode(map,pd)
+
+    % randomly pick configuration
+    pn       = map.width*rand;
+    pe       = map.width*rand;
+    pd       = pd; % constant altitute paths
+    cost     = 0;
+    node     = [pn, pe, pd, 0, cost, 0, 0];
+    % format:  [N, E, D, chi, cost, parent_idx, flag_connect_to_goal]
+    
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -110,7 +129,7 @@ function collision_flag = collision(dubinspath, pd, map)
     end
     
     % check to see if outside of world
-    if (max(X)>map.width) || (min(X)<0) || (max(Y)>map.width) || (min(Y)<0),
+    if (dubinspath.pe(1)>map.width) || (dubinspath.pe(1)<0) || (dubinspath.pe(2)>map.width) || (dubinspath.pe(2)<0),
         collision_flag = 1;
     end
 end

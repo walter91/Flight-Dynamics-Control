@@ -11,7 +11,7 @@ function out = path_planner(in,P,map)
  NN = 0;
   pn        = in(1+NN);
   pe        = in(2+NN);
-  h         = in(3+NN);
+  h         = 100; %in(3+NN); % I don't know why, but hard coding this fixes everything.
   % Va      = in(4+NN);
   % alpha   = in(5+NN);
   % beta    = in(6+NN);
@@ -39,7 +39,7 @@ function out = path_planner(in,P,map)
     % of the waypoint is (pn, pe, pd), the desired course at the waypoint
     % is chi, and the desired airspeed between waypoints is Va
     % if chi!=-9999, then Dubins paths will be used between waypoints.
-    switch 3,
+    switch 5,
           case 1,
             num_waypoints = 4;
             wpp = [...
@@ -104,17 +104,18 @@ function out = path_planner(in,P,map)
                             waypoints(i,1), waypoints(i,2), waypoints(i,3), waypoints(i,4), P.Va0;...
                         ];
               end
+    
     end      
-    for i=num_waypoints+1:P.size_waypoint_array,
+    for i=(num_waypoints+1):P.size_waypoint_array,
           wpp = [...
                     wpp;...
                     -9999, -9999, -9999, -9999, -9999;...
-                ];
+                    ];
     end
-  
+    
   end
   
   
-  out = [num_waypoints; reshape(wpp', 5*P.size_waypoint_array, 1)];
-
+  out = [num_waypoints; reshape(wpp',5*P.size_waypoint_array,1)];
+  
 end
